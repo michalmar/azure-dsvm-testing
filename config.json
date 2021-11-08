@@ -1,0 +1,6 @@
+{
+    "image_publisher": "microsoft-dsvm",
+    "vm_region":"westeurope",
+    "blob_storage_name" : "dsvmimagesmma",
+    "image_resource_group" : "Q-SharedImageGallery"
+}
