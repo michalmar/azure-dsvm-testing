@@ -57,8 +57,23 @@ if ($onlybuild) {
         Write-Host "Trying without login..."
     } 
     else {
-        # login into azopy, only when parameter is there
-        azcopy login --tenant-id $tenant_id
+        # # login into azopy, only when parameter is there
+        # azcopy login --tenant-id $tenant_id
+        
+        # how you get the sec password
+        # $secPassword = ConvertTo-SecureString -AsPlainText -Force -String '<our password here>'
+        # $secPassword | ConvertFrom-SecureString | Out-File -FilePath C:\config-sp-secrets.txt
+        ## Authenticate through service principal into Azure
+        $azureAppCred = (New-Object System.Management.Automation.PSCredential $secrets.sp_app_id, ($secrets.sp_pass_sec | ConvertTo-SecureString))
+        Connect-AzAccount -ServicePrincipal -SubscriptionId $secrets.subscription_id -TenantId $secrets.tenant_id -Credential $azureAppCred
+
+        # quest-sp-pass-powershell
+        $secret_sp_pass = Get-AzKeyVaultSecret -VaultName "quest-kv" -Name "quest-sp-pass-powershell" -AsPlainText
+
+        $Env:AZCOPY_SPA_CLIENT_SECRET = $secret_sp_pass
+        azcopy login --tenant-id $tenant_id --service-principal --application-id $secrets.sp_app_id
+
+        Write-Host "Logged into AzCopy!"
     }
 }
 

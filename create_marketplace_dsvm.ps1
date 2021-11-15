@@ -40,7 +40,12 @@ $inbound_ip_address = $secrets.inbound_ip_address # IP address for restriction f
 $image_publisher = $config.image_publisher # "microsoft-dsvm"
 ###############################################################################
 
-
+# how you get the sec password
+# $secPassword = ConvertTo-SecureString -AsPlainText -Force -String '<our password here>'
+# $secPassword | ConvertFrom-SecureString | Out-File -FilePath C:\config-sp-secrets.txt
+## Authenticate through service principal into Azure
+$azureAppCred = (New-Object System.Management.Automation.PSCredential $secrets.sp_app_id, ($secrets.sp_pass_sec | ConvertTo-SecureString))
+Connect-AzAccount -ServicePrincipal -SubscriptionId $secrets.subscription_id -TenantId $secrets.tenant_id -Credential $azureAppCred
 
 if ("Windows" -eq $ostype)
 {
